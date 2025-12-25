@@ -37,7 +37,7 @@ const Announcements = () => {
       const params = {};
       if (filterPriority) params.priority = filterPriority;
 
-      const response = await api.get('/announcements', { params });
+      const response = await api.get('/api/announcements', { params });
       setAnnouncements(response.data.data.announcements);
     } catch (error) {
       console.error('Failed to fetch announcements:', error);
