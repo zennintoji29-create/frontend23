@@ -66,7 +66,8 @@ const Announcements = () => {
         delete payload.targetAudience.semester;
       }
 
-      await api.post('/admin/announcements', payload);
+      await api.post('/admin/announcement', payload);
+
       setShowCreateForm(false);
       setCreateForm({
         title: '',
