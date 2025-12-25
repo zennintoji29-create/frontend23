@@ -1,7 +1,9 @@
-
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
+
+// ⚠️ FRONTEND-ONLY ADMIN PASS (DEMO PURPOSE ONLY)
+const ADMIN_PASS = 'collegeops-admin-2025';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -12,7 +14,9 @@ const Register = () => {
     rollNumber: '',
     department: '',
     semester: '',
+    adminPass: '', // 👈 admin soft-lock field
   });
+
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -28,6 +32,7 @@ const Register = () => {
     setError('');
     setLoading(true);
 
+    // Basic validation
     if (!formData.name || !formData.email || !formData.password) {
       setError('Please fill in all required fields');
       setLoading(false);
@@ -40,6 +45,16 @@ const Register = () => {
       return;
     }
 
+    // 🔒 ADMIN SOFT LOCK CHECK
+    if (formData.role === 'admin') {
+      if (formData.adminPass !== ADMIN_PASS) {
+        setError('Invalid admin pass');
+        setLoading(false);
+        return;
+      }
+    }
+
+    // Payload sent to backend
     const userData = {
       name: formData.name,
       email: formData.email,
@@ -50,7 +65,9 @@ const Register = () => {
     if (formData.role === 'student') {
       userData.rollNumber = formData.rollNumber;
       userData.department = formData.department;
-      userData.semester = formData.semester ? parseInt(formData.semester) : undefined;
+      userData.semester = formData.semester
+        ? parseInt(formData.semester)
+        : undefined;
     }
 
     const result = await register(userData);
@@ -92,19 +109,17 @@ const Register = () => {
                 value={formData.name}
                 onChange={handleChange}
                 className="input-field"
-                placeholder="John Doe"
               />
             </div>
 
             <div>
-              <label className="label">Email Address *</label>
+              <label className="label">Email *</label>
               <input
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
                 className="input-field"
-                placeholder="you@example.com"
               />
             </div>
 
@@ -116,7 +131,6 @@ const Register = () => {
                 value={formData.password}
                 onChange={handleChange}
                 className="input-field"
-                placeholder="••••••••"
               />
             </div>
 
@@ -133,6 +147,22 @@ const Register = () => {
               </select>
             </div>
 
+            {/* 🔐 Admin Pass Field */}
+            {formData.role === 'admin' && (
+              <div>
+                <label className="label">Admin Pass *</label>
+                <input
+                  type="password"
+                  name="adminPass"
+                  value={formData.adminPass}
+                  onChange={handleChange}
+                  className="input-field"
+                  placeholder="Enter admin pass"
+                />
+              </div>
+            )}
+
+            {/* Student-only fields */}
             {formData.role === 'student' && (
               <>
                 <div>
@@ -143,7 +173,6 @@ const Register = () => {
                     value={formData.rollNumber}
                     onChange={handleChange}
                     className="input-field"
-                    placeholder="21CS001"
                   />
                 </div>
 
@@ -155,7 +184,6 @@ const Register = () => {
                     value={formData.department}
                     onChange={handleChange}
                     className="input-field"
-                    placeholder="Computer Science"
                   />
                 </div>
 
@@ -168,7 +196,7 @@ const Register = () => {
                     className="input-field"
                   >
                     <option value="">Select Semester</option>
-                    {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => (
+                    {[1,2,3,4,5,6,7,8].map((sem) => (
                       <option key={sem} value={sem}>
                         Semester {sem}
                       </option>
@@ -178,18 +206,14 @@ const Register = () => {
               </>
             )}
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-primary w-full"
-            >
+            <button type="submit" disabled={loading} className="btn-primary w-full">
               {loading ? 'Creating account...' : 'Create Account'}
             </button>
           </form>
 
           <p className="mt-6 text-center text-gray-400 text-sm">
             Already have an account?{' '}
-            <Link to="/login" className="text-blue-400 hover:text-blue-300 font-medium">
+            <Link to="/login" className="text-blue-400 hover:text-blue-300">
               Sign in
             </Link>
           </p>
