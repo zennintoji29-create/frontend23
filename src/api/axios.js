@@ -1,11 +1,13 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://backend23-wuq7.onrender.com',
+  baseURL: import.meta.env.VITE_API_URL || 'https://backend23-wuq7.onrender.com/api',
   headers: {
     'Content-Type': 'application/json',
   },
 });
+
+
 
 api.interceptors.request.use(
   (config) => {
